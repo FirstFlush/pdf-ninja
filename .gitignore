@@ -1,0 +1,78 @@
+# -----------------------------
+# Python / Build
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+*.pkl
+*.log
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# -----------------------------
+# IDE / Editor
+# -----------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# -----------------------------
+# OS-specific
+# -----------------------------
+.DS_Store
+Thumbs.db
+
+# -----------------------------
+# Notebooks / Data
+# -----------------------------
+*.ipynb_checkpoints
+*.pdf
+*.csv
+*.xlsx
+*.jsonl
+*.parquet
+data/
+samples/
+tmp/
+cache/
+output/
+logs/
+
+# -----------------------------
+# Testing / Coverage
+# -----------------------------
+.coverage
+htmlcov/
+.tox/
+pytest_cache/
+nosetests.xml
+junit.xml
+
+# -----------------------------
+# Docs / Misc
+# -----------------------------
+docs/_build/
+site/
+
+# -----------------------------
+# Optional: poetry / pip-tools
+# -----------------------------
+poetry.lock
+requirements.lock
+*.bak
+*.tmp
