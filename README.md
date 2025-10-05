@@ -56,7 +56,7 @@ Builders assemble the extracted elements into higher-level data structures:
 
 A parsed PDF produces a structured object that’s JSON-serializable:
 
-```
+```json
 {
   "source": "annual_report_2023.pdf",
   "metadata": { "title": "Annual Report 2023", "page_count": 42 },
