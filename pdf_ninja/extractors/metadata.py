@@ -1,8 +1,9 @@
-from ._base import BaseExtractor
-from ..dataclasses import PdfContext
+from pathlib import Path
+from pypdf import PdfReader
+from typing import Any
 
 
-class MetadataExtractor(BaseExtractor):
+class MetadataExtractor:
     
-    def extract(self, ctx: PdfContext):
-        ...
+    def extract_metadata(self, path: Path, pdf_reader: PdfReader) -> dict[str, Any]:
+        return {}
