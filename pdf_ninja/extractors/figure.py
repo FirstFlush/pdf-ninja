@@ -2,7 +2,7 @@ from ._base import BaseExtractor
 from ..dataclasses import PdfContext
 
 
-class TextExtractor(BaseExtractor):
+class FigureExtractor(BaseExtractor):
     
     def extract(self, ctx: PdfContext):
         ...
