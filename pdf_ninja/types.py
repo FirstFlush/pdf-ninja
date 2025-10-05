@@ -1,4 +1,4 @@
-from typing import Any, Literal, TypedDict
+from typing import Any, TypedDict
 from typing_extensions import NotRequired
 
 
