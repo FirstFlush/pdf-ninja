@@ -34,7 +34,7 @@ class PdfElement:
     page: int
     order: int = field(default=-1)              # set downstream when PdfPage is being built
     content: Optional[str] = None               # Used for text or textified tables
-    rows: Optional[list[list[str]]] = None      # Used for structured tables
+    rows: Optional[list[list[str | None]]] = None      # Used for structured tables
     bbox: Optional[list[float]] = None          # [x0, y0, x1, y1]
     font_size: Optional[float] = None
     font_name: Optional[str] = None
@@ -65,7 +65,7 @@ class PdfPage:
                 lines.append(el.content or "")
             elif el.type == "table" and include_tables:
                 if el.rows:
-                    rows_as_text = [" | ".join(r) for r in el.rows]
+                    rows_as_text = [" | ".join((a if a is not None else "") for a in r) for r in el.rows]
                     lines.append("\n".join(rows_as_text))
                 elif el.content:
                     lines.append(el.content)

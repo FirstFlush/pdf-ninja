@@ -3,8 +3,8 @@ from pathlib import Path
 import pdfplumber
 from .builders.pdf_context import PdfContextBuilder
 from .builders.parsed_pdf import PdfBuilder
-from .dataclasses import PdfContext, ExtractedElements, ParsedPdf
-from .exc import PdfNinjaParsingError
+from .dataclasses import ExtractedElements, PdfContext, ParsedPdf
+from .exc import PdfNinjaParsingError, PdfNinjaError
 from .extractors.figure import FigureExtractor
 from .extractors.image import ImageExtractor
 from .extractors.metadata import MetadataExtractor
@@ -36,7 +36,7 @@ class PdfNinja:
                     extractor_config=extractor_config
                 )
                 return self._parse(path=path, ctx=pdf_context)
-        except PdfNinjaParsingError:
+        except PdfNinjaError:
             raise
         except (OSError, ValueError) as e:
             raise PdfNinjaParsingError(f"Failed to open PDF with pdfplumber: {e}") from e
@@ -44,9 +44,11 @@ class PdfNinja:
             raise PdfNinjaParsingError(f"Unexpected error while parsing {path.name}: {e}") from e
 
     def _parse(self, path: Path, ctx: PdfContext) -> ParsedPdf:
-        extracted_elements = self._extract(path, ctx)        
-
-        return PdfBuilder(extracted_elements).build_parsed_pdf()
+        extracted_elements = self._extract(path, ctx)
+        logger.debug("Extracted all elements. Building ParsedPdf object...")    
+        pdf = self._build_pdf(path=path, extracted=extracted_elements)
+        logger.debug("ParsedPdf object successfully built")
+        return pdf
 
     def _extract(self, path: Path, ctx: PdfContext) -> ExtractedElements:
         return ExtractedElements(
@@ -56,6 +58,9 @@ class PdfNinja:
             figures = self.figure_extractor.extract(ctx),
             meta = self.metadata_extractor.extract_metadata(path=path, pdf_reader=ctx.pypdf_reader),
         )
+
+    def _build_pdf(self, path: Path, extracted: ExtractedElements) -> ParsedPdf:
+        return PdfBuilder(path=path, extracted_elements=extracted).build_parsed_pdf()
 
     def _build_context(
             self, path: Path, 

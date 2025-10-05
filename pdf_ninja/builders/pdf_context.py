@@ -34,7 +34,7 @@ class PdfContextBuilder:
 
     def _camelot(self, path: Path, config: dict[str, Any]) -> TableList:
         try:
-            return read_pdf_camelot(str(path), **config)
+            return read_pdf_camelot(str(path), pages="all", flavor="hybrid", **config)
         except (OSError, ValueError) as e:
             raise PdfNinjaParsingError(f"Camelot I/O error for {path.name}: {e}") from e
 

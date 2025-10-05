@@ -1,11 +1,13 @@
+from pathlib import Path
 from ..dataclasses import ExtractedElements, ParsedPdf, PdfPage, PdfElement
 
 
 class PdfBuilder:
     
-    def __init__(self, extracted_elements: ExtractedElements):
+    def __init__(self, path: Path, extracted_elements: ExtractedElements):
         self.extracted = extracted_elements
-        
+        self.path = path
+
     def build_parsed_pdf(self) -> ParsedPdf:
         """
         Assemble a full ParsedPdf object from extracted elements.
@@ -43,12 +45,14 @@ class PdfBuilder:
         """
         Sort page elements roughly in visual reading order:
         top-to-bottom, then left-to-right.
+        pdfplumber coordinates increase downward (y grows toward page bottom),
+        so sort ascending by y0, then x0.
         """
-        def sort_key(el: PdfElement):
-            if not el.bbox:
-                return (0, 0)
-            x0, y0, x1, y1 = el.bbox
-            # In PDF coordinate space, higher y means higher up.
-            return (-y1, x0)
-
-        return sorted(elements, key=sort_key)
+        sorted_elements = sorted(
+            elements,
+            key=lambda el: (
+                el.bbox[1] if el.bbox else float("inf"),  # top (y0)
+                el.bbox[0] if el.bbox else float("inf"),  # left (x0)
+            ),
+        )
+        return sorted_elements
