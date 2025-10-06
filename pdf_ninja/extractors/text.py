@@ -1,5 +1,6 @@
 from ._base import BaseElementExtractor
 from ..dataclasses import PdfContext, PdfElement
+from ..types import ElementsByPage
 from pdfplumber.page import Page
 from typing import Any
 
@@ -9,11 +10,11 @@ class TextExtractor(BaseElementExtractor):
     def __init__(self, min_font_size: float = 0.0):
         self.min_font_size = min_font_size
 
-    def extract(self, ctx: PdfContext) -> dict[int, list[PdfElement]]:
+    def extract(self, ctx: PdfContext) -> ElementsByPage:
         if ctx.pdf_plumber is None:
             return {}
 
-        results: dict[int, list[PdfElement]] = {}
+        results: ElementsByPage = {}
 
         for i, page in enumerate(ctx.pdf_plumber.pages, start=1):
             elements = self._extract_page_text(page, page_number=i)
@@ -22,21 +23,15 @@ class TextExtractor(BaseElementExtractor):
 
         return results
 
-    # ------------------------------------------------------------------
-
     def _extract_page_text(self, page: Page, page_number: int) -> list[PdfElement]:
-        # 1️⃣ Extract raw words
         words = page.extract_words(x_tolerance=2, y_tolerance=4)
         if not words:
             return []
 
-        # 2️⃣ Sort visually
         words.sort(key=lambda w: (w["top"], w["x0"]))
 
-        # 3️⃣ Group words into lines
         line_groups = self._group_words_into_lines(words, y_tolerance=4.0)
 
-        # 4️⃣ Convert lines → PdfElement lines
         line_elements: list[PdfElement] = []
         for line_words in line_groups:
             text = " ".join(w["text"].strip() for w in line_words if w.get("text"))
@@ -65,12 +60,9 @@ class TextExtractor(BaseElementExtractor):
                 )
             )
 
-        # 5️⃣ Merge lines into paragraph blocks
         block_elements = self._group_lines_into_blocks(line_elements, y_gap=8.0)
 
         return block_elements
-
-    # ------------------------------------------------------------------
 
     def _group_words_into_lines(
         self, words: list[dict[str, Any]], y_tolerance: float = 3.0

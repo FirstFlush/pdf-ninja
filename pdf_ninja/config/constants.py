@@ -1,0 +1,2 @@
+
+TABLE_MAX_CELL_LEN = 70

@@ -7,7 +7,7 @@ from tabula.errors import JavaNotFoundError
 from typing import Any, cast
 import pdfplumber
 from pypdf import PdfReader
-from ..dataclasses import PdfContext
+from ..dataclasses import PdfContext, CamelotTables
 from ..exc import PdfNinjaParsingError
 from ..types import ExtractorConfig
 
@@ -32,9 +32,15 @@ class PdfContextBuilder:
             tabula_tables = self._tabula(path, config=extractor_config.get("tabula", {})),
         )
 
-    def _camelot(self, path: Path, config: dict[str, Any]) -> TableList:
+    def _camelot(self, path: Path, config: dict[str, Any]) -> CamelotTables:
         try:
-            return read_pdf_camelot(str(path), pages="all", flavor="hybrid", **config)
+            lattice_tables = read_pdf_camelot(str(path), pages="all", flavor="lattice", **config)
+            stream_tables = read_pdf_camelot(str(path), pages="all", flavor="stream", **config)
+            return CamelotTables(
+                lattice=lattice_tables,
+                stream=stream_tables,
+            )
+        
         except (OSError, ValueError) as e:
             raise PdfNinjaParsingError(f"Camelot I/O error for {path.name}: {e}") from e
 

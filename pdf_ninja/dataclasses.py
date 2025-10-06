@@ -8,11 +8,18 @@ ElementType = Literal["text", "table", "image", "figure"]
 
 
 @dataclass
+class CamelotTables:
+    
+    lattice: Optional[TableList] = None
+    stream: Optional[TableList] = None
+
+
+@dataclass
 class PdfContext:
 
     pypdf_reader: PdfReader    
     pdf_plumber: Optional[PDF] = None
-    camelot_tables: Optional[TableList] = None
+    camelot_tables: Optional[CamelotTables] = None
     tabula_tables: Optional[dict[str, Any]] = None
 
 

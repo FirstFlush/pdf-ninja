@@ -1,5 +1,8 @@
-from typing import Any, TypedDict
+from typing import Any, TypeAlias, TypedDict
 from typing_extensions import NotRequired
+from .dataclasses import PdfElement
+
+ElementsByPage: TypeAlias = dict[int, list[PdfElement]]
 
 
 class ExtractorConfig(TypedDict, total=False):

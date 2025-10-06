@@ -1,8 +1,8 @@
-from ._base import BaseExtractor
+from ._base import BaseElementExtractor
 from ..dataclasses import PdfContext
 
 
-class FigureExtractor(BaseExtractor):
+class FigureExtractor(BaseElementExtractor):
     
     def extract(self, ctx: PdfContext):
         ...
