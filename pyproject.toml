@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-ninja"
+version = "0.1.0"
+description = "Layout-aware PDF parser that extracts text, tables, and metadata into structured JSON."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Michael Pearce", email = "firstflush@protonmail.com" }
+]
+keywords = ["pdf", "parser", "pdfplumber", "camelot", "tabula", "layout"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Developers",
+    "Topic :: Text Processing :: Markup",
+    "Topic :: Software Development :: Libraries :: Python Modules"
+]
+
+dependencies = [
+    "pdfplumber>=0.11.0",
+    "camelot-py[cv]>=1.0.0",
+    "tabula-py>=2.9.0",
+    "pypdf>=3.15.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/FirstFlush/pdf-ninja"
+Repository = "https://github.com/FirstFlush/pdf-ninja"
+Issues = "https://github.com/FirstFlush/pdf-ninja/issues"
