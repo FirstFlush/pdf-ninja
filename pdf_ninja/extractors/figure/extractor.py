@@ -1,5 +1,5 @@
-from ._base import BaseElementExtractor
-from ..dataclasses import PdfContext
+from .._base import BaseElementExtractor
+from ...dataclasses import PdfContext
 
 
 class FigureExtractor(BaseElementExtractor):

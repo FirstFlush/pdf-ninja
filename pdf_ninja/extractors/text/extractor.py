@@ -1,6 +1,6 @@
-from ._base import BaseElementExtractor
-from ..dataclasses import PdfContext, PdfElement
-from ..types import ElementsByPage
+from .._base import BaseElementExtractor
+from ...dataclasses import PdfContext, PdfElement
+from ...types import ElementsByPage
 from pdfplumber.page import Page
 from typing import Any
 

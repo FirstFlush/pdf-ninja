@@ -1,40 +1,8 @@
-from ._base import BaseElementExtractor
-from ..config.constants import TABLE_MAX_CELL_LEN, TABLE_IOU_THRESHOLD
-from ..dataclasses import PdfContext, PdfElement
-from ..types import ElementsByPage
 from camelot.core import TableList, Table
-import logging
-from typing import Literal, Optional, TypedDict
-
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
-
-
-class TableMeta(TypedDict):
-    source: Literal["camelot", "tabula"]
-    flavor: Literal["lattice", "stream", "unknown"]
-    accuracy: Optional[float]                               # Camelot's geometric accuracy score (0–100). Tabula does not provide accuracy score.
-    columns_detected: Optional[int]
-    rows_detected: Optional[int]
-    page_area: Optional[tuple[float, float, float, float]]  # [x0, y0, x1, y1] bounding box on page
-
-
-class TableExtractor(BaseElementExtractor):
-    
-    def __init__(self):
-        self._camelot_extractor = CamelotExtractor()
-        self._tabula_extractor = TabulaExtractor()
-    
-    def extract(self, ctx: PdfContext) -> ElementsByPage:
-        try:
-            return self._extract(ctx)
-        except Exception as e:
-            raise
-        
-    def _extract(self, ctx: PdfContext) -> ElementsByPage:
-        results = self._camelot_extractor.extract(ctx)
-        return results
-
+from ...config.constants import TABLE_IOU_THRESHOLD, TABLE_MAX_CELL_LEN
+from ...dataclasses import PdfContext, PdfElement
+from ...types import ElementsByPage
+from ._meta import TableMeta
 
 class CamelotExtractor:
 
@@ -144,10 +112,3 @@ class CamelotExtractor:
         b2_area = (b2[2] - b2[0]) * (b2[3] - b2[1])
         union_area = b1_area + b2_area - inter_area
         return inter_area / union_area if union_area else 0
-
-
-class TabulaExtractor:
-        
-    def extract(self, ctx: PdfContext) -> ElementsByPage:
-        raise NotImplementedError("Tabular table extraction not yet implemented")
-        

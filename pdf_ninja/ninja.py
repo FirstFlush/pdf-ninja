@@ -5,11 +5,11 @@ from .builders.pdf_context import PdfContextBuilder
 from .builders.parsed_pdf import PdfBuilder
 from .dataclasses import ExtractedElements, PdfContext, ParsedPdf
 from .exc import PdfNinjaParsingError, PdfNinjaError
-from .extractors.figure import FigureExtractor
-from .extractors.image import ImageExtractor
-from .extractors.metadata import MetadataExtractor
-from .extractors.table import TableExtractor
-from .extractors.text import TextExtractor
+from .extractors.figure.extractor import FigureExtractor
+from .extractors.image.extractor import ImageExtractor
+from .extractors.metadata.extractor import MetadataExtractor
+from .extractors.table.extractor import TableExtractor
+from .extractors.text.extractor import TextExtractor
 from .types import ExtractorConfig
 
 logger = logging.getLogger(__name__)
