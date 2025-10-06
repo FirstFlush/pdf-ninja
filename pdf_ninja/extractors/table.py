@@ -1,5 +1,5 @@
 from ._base import BaseElementExtractor
-from ..config.constants import TABLE_MAX_CELL_LEN
+from ..config.constants import TABLE_MAX_CELL_LEN, TABLE_IOU_THRESHOLD
 from ..dataclasses import PdfContext, PdfElement
 from ..types import ElementsByPage
 from camelot.core import TableList, Table
@@ -23,7 +23,7 @@ class TableExtractor(BaseElementExtractor):
     
     def __init__(self):
         self._camelot_extractor = CamelotExtractor()
-        self._tabula_extractpr = TabulaExtractor()
+        self._tabula_extractor = TabulaExtractor()
     
     def extract(self, ctx: PdfContext) -> ElementsByPage:
         try:
@@ -33,7 +33,6 @@ class TableExtractor(BaseElementExtractor):
         
     def _extract(self, ctx: PdfContext) -> ElementsByPage:
         results = self._camelot_extractor.extract(ctx)
-        logger.debug(f"Camelt extracted {len(results.keys())}")
         return results
 
 
@@ -51,7 +50,7 @@ class CamelotExtractor:
         stream = list(ctx.camelot_tables.stream or [])
         combined = TableList(lattice + stream)
         deduplicated = self._dedupe_by_bbox(tables=combined)
-        
+
         return self._create_elements(deduplicated)
         
     def _create_elements(self, tables: TableList) -> ElementsByPage:
@@ -59,7 +58,10 @@ class CamelotExtractor:
         for table in tables:
             try:
                 page_num = int(getattr(table, "page", 1))
-                x0, y0, x1, y1 = getattr(table, "_bbox", (0.0, 0.0, 0.0, 0.0))
+                bbox = getattr(table, "_bbox", None)
+                if not bbox or len(bbox) != 4:
+                    continue
+                x0, y0, x1, y1 = bbox
 
                 # Normalize table cells: strip text and convert blanks to None
                 raw_rows = table.df.values.tolist()
@@ -95,14 +97,44 @@ class CamelotExtractor:
 
         return results
 
-    def _dedupe_by_bbox(self, tables: TableList, iou_threshold=0.6) -> TableList:
+    def _dedupe_by_bbox(self, tables: TableList) -> TableList:
         unique: list[Table] = []
+
         for t in tables:
-            if not any(self._iou(t._bbox, u._bbox) > iou_threshold for u in unique):
+            # Skip tables with missing bbox
+            if not getattr(t, "_bbox", None):
+                continue
+
+            # check if overlaps with an existing one
+            duplicate_index: int | None = None
+            for i, u in enumerate(unique):
+                if self._iou(t._bbox, u._bbox) > TABLE_IOU_THRESHOLD:
+                    duplicate_index = i
+                    break
+
+            if duplicate_index is None:
+                # no overlap → keep
                 unique.append(t)
+            else:
+                # overlap found — decide which to keep
+                current = unique[duplicate_index]
+                # prefer stream over lattice
+                if getattr(t, "flavor", "") == "stream" and getattr(current, "flavor", "") == "lattice":
+                    unique[duplicate_index] = t
+                # otherwise, keep existing
+                else:
+                    continue
+
         return TableList(unique)
 
-    def _iou(self, b1, b2):
+
+    def _iou(
+            self, 
+            b1: tuple[float, float, float, float] | None, 
+            b2: tuple[float, float, float, float]| None
+    ) -> float:
+        if not b1 or not b2:
+            return 0
         x0 = max(b1[0], b2[0])
         y0 = max(b1[1], b2[1])
         x1 = min(b1[2], b2[2])
@@ -114,11 +146,8 @@ class CamelotExtractor:
         return inter_area / union_area if union_area else 0
 
 
-
-
-
 class TabulaExtractor:
         
     def extract(self, ctx: PdfContext) -> ElementsByPage:
-        ...
+        raise NotImplementedError("Tabular table extraction not yet implemented")
         
