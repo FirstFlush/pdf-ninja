@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://i.imgur.com/xqucH5L.png" width="300" alt="PDF Ninja logo">
+</p>
+
 # 🥷 PDF-Ninja
 
 **PDF-Ninja** is a modular, Python-based PDF parsing **library** built for **AI and data extraction pipelines** — especially **RAG (Retrieval-Augmented Generation)** systems.
