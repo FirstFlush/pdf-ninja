@@ -29,6 +29,10 @@ dependencies = [
     "pypdf>=3.15.0",
 ]
 
+[project.optional-dependencies]
+llamaindex = ["llama-index>=0.10.0"]
+langchain = ["langchain>=0.2.0"]
+
 [project.urls]
 Homepage = "https://github.com/FirstFlush/pdf-ninja"
 Repository = "https://github.com/FirstFlush/pdf-ninja"
